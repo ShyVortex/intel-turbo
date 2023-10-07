@@ -26,6 +26,17 @@
  $ sudo systemctl status intel-noturbo.service
 ```
 
+ You can also directly ask the system if Turbo Boost is enabled or disabled after applying either of the services with:
+
+```shell
+ $ cat /sys/devices/system/cpu/intel_pstate/no_turbo
+```
+ This returns:
+ 
+   - ```0``` if turbo is enabled;
+   
+   - ```1``` if turbo is disabled.
+
 # Removal
  If you want to uninstall both services, first you need to disable the one that is currently running and that's active on startup. Assuming that the noturbo service is active, you can disable it with:
  
