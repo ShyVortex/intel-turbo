@@ -37,6 +37,19 @@
    
    - ```1``` if turbo is disabled.
 
+# Usage outside of systemd
+ As we all know not all Linux distributions come with the systemd daemon, but they may use other alternatives like OpenRC, runit or s6. In this case, you can still use the scripts but you can't enable them at startup with
+ the method written above. What you can do instead is copy the intel folder in your system's /opt/ and follow one of the other methods listed [here](https://operavps.com/docs/run-command-after-boot-in-linux/) to
+ enable their autoexecution at startup. 
+ If you only want to execute them manually at your own pace, you can do so by opening the terminal and writing one of these two commands:
+
+```shell
+ $ sudo ./opt/intel/intel_noturbo.sh                                                                    # disable turbo boost
+
+sudo ./opt/intel/intel_turbo.sh                                                                         # enable turbo boost
+```
+ 
+
 # Removal
  If you want to uninstall both services, first you need to disable the one that is currently running and that's active on startup. Assuming that the noturbo service is active, you can disable it with:
  
