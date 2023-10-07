@@ -1,0 +1,8 @@
+[Unit]
+Description=Enable Turbo Boost on Intel CPUs
+
+[Service]
+ExecStart=/opt/intel/intel_turbo.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Disable Turbo Boost on Intel CPUs
+
+[Service]
+ExecStart=/opt/intel/intel_noturbo.sh
+
+[Install]
+WantedBy=multi-user.target
