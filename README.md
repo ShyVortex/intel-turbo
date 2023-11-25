@@ -5,7 +5,7 @@
  These simple scripts are used through two systemd services to enable or disable the Intel Turbo Boost technology on any Linux distribution that supports the intel_pstate frequency driver. To check if your system supports it, open the terminal and run:
  
  ```shell
- $ cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver
+ cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver
 ```
 
  It should return ```intel_pstate``` for each CPU thread.
@@ -17,25 +17,25 @@
  you can start the service and disable Turbo Boost automatically at startup with:
 
  ```shell
- $ sudo systemctl enable --now intel-noturbo.service
+ sudo systemctl enable --now intel-noturbo.service
 ```
 
  Or, you can just disable turbo manually at your will and not automatically at startup with:
  
  ```shell
- $ sudo systemctl start intel-noturbo.service
+ sudo systemctl start intel-noturbo.service
 ```
 
  While you can check the service status with:
 
  ```shell
- $ sudo systemctl status intel-noturbo.service
+ sudo systemctl status intel-noturbo.service
 ```
 
  You can also directly ask the system if Turbo Boost is enabled or disabled after applying either of the services with:
 
 ```shell
-$ cat /sys/devices/system/cpu/intel_pstate/no_turbo
+cat /sys/devices/system/cpu/intel_pstate/no_turbo
 ```
  This returns:
  
@@ -47,13 +47,13 @@ $ cat /sys/devices/system/cpu/intel_pstate/no_turbo
  If you want to uninstall both services, first you need to disable the one that is currently running and that's active on startup. Assuming that the noturbo service is active, you can disable it with:
  
  ```shell
- $ sudo systemctl disable --now intel-noturbo.service
+ sudo systemctl disable --now intel-noturbo.service
 ```
 
  Once the active one is disabled, you can proceed to mask both services so they cannot be started by any means. You can do so with:
 
  ```shell
- $ sudo systemctl mask intel-noturbo.service
+ sudo systemctl mask intel-noturbo.service
 
  sudo systemctl mask intel-turbo.service
  ```
@@ -61,7 +61,7 @@ $ cat /sys/devices/system/cpu/intel_pstate/no_turbo
  You can now proceed to permanently remove the files from your system. You need to delete both the intel folder from /opt/ and the systemd files for these services.
 
 ```shell
-$ sudo rm -r /opt/intel/
+sudo rm -r /opt/intel/
 
 sudo rm /etc/systemd/system/intel-noturbo.service /etc/systemd/system/intel-turbo.service 
 ```
@@ -75,11 +75,11 @@ sudo rm /etc/systemd/system/intel-noturbo.service /etc/systemd/system/intel-turb
  The first disables Turbo Boost, the second enables it.
 
 ```shell
-$ sudo ./opt/intel/intel_noturbo.sh
+sudo ./opt/intel/intel_noturbo.sh
 ```
 
 ```shell
-$ sudo ./opt/intel/intel_turbo.sh
+sudo ./opt/intel/intel_turbo.sh
 ```
 
  As an example, we can use the Cron Job method to automatically run one of these two scripts at startup on non-systemd distributions. To do so, you have to first make sure that cronie is installed on your system.
@@ -88,31 +88,31 @@ $ sudo ./opt/intel/intel_turbo.sh
 - If you are on Debian or Ubuntu, type
 
   ```shell
-  $ sudo apt install cronie
+  sudo apt install cronie
   ```
 
 - On Fedora or RHEL, type
 
   ```shell
-  $ sudo yum install cronie
+  sudo yum install cronie
   ```
 
 - On Arch Linux and its derivatives, type
 
   ```shell
-  $ sudo pacman -S cronie
+  sudo pacman -S cronie
   ```
    
  You can check if the installation was successful with:
 
  ```shell
- $ crond -V
+ crond -V
  ```
 
  Now we need to edit the cron table to add our task which runs one of the two custom scripts on startup. Assuming we want to run the script to disable turbo, type:
 
  ```shell
- $ crontab -e
+ crontab -e
  ```
 
  Then add said task using the @reboot expression, which executes the code once at startup:
@@ -125,7 +125,7 @@ $ sudo ./opt/intel/intel_turbo.sh
  You can then proceed to delete all files from your system, following the same method in [Removal](https://github.com/ShyVortex/intel-turbo/edit/main/README.md#removal):
 
  ```shell
- $ sudo rm -r /opt/intel/
+ sudo rm -r /opt/intel/
 
  sudo rm /etc/systemd/system/intel-noturbo.service /etc/systemd/system/intel-turbo.service 
  ```
