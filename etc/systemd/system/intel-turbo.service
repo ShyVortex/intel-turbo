@@ -2,6 +2,8 @@
 Description=Enable Turbo Boost on Intel CPUs
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/opt/intel/intel_turbo.sh
 
 [Install]
