@@ -1,5 +1,5 @@
 [Unit]
-Description=Disable Turbo Boost on Intel CPUs
+Description=Enable Turbo Boost on Intel CPUs
 After=getty.target
 
 [Service]
