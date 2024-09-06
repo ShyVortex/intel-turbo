@@ -1,10 +1,11 @@
 [Unit]
-Description=Enable Turbo Boost on Intel CPUs
+Description=Disable Turbo Boost on Intel CPUs
+After=getty.target
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
 ExecStart=/opt/intel/intel_turbo.sh
+RemainAfterExit=yes
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=getty.target
