@@ -1,5 +1,5 @@
 # intel-turbo
- Linux script to manage Turbo Boost on Intel CPUs
+ Linux script to disable Turbo Boost on Intel CPUs
 
 # Description
  This simple script is used through a systemd service to disable the Intel Turbo Boost technology on any Linux distribution that supports the intel_pstate frequency driver. To check if your system supports it, open the terminal and run:
