@@ -13,6 +13,12 @@
 # Installation
  It is very easy to install this script. The intel folder in opt should be placed under the /opt/ folder of your Linux distribution, while the intel-noturbo service file should be placed under the system subfolder of the systemd
  directory, located in /etc/systemd/system/. I've also put it inside its correct destination folder right in the repository so you can quickly identify where it should be dropped.
+
+ You may notice the script doesn't have execution privileges after extracting it. Make sure to set them:
+  ```shell
+ chmod +x /opt/intel/intel_noturbo.sh
+```
+
  If you want to automatically disable Turbo Boost at startup, you can do so with with:
 
  ```shell
