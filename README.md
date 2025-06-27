@@ -1,134 +1,224 @@
 # intel-turbo
- Linux script to disable Turbo Boost on Intel CPUs
 
-# Description
- This simple script is used through a systemd service to disable the Intel Turbo Boost technology on any Linux distribution that supports the intel_pstate frequency driver. To check if your system supports it, open the terminal and run:
+A simple Linux script to disable Intel Turbo Boost on systems using the `intel_pstate` frequency driver.
 
- ```shell
- cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver
+---
+
+## Description
+
+This script disables Intel Turbo Boost technology on supported Linux distributions. It can be used with **systemd**, **SysVinit**, or manually through other startup mechanisms.
+
+To check if your system supports the `intel_pstate` driver, run:
+
+```bash
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver
 ```
 
- It should return ```intel_pstate``` for each CPU thread.
+If all outputs return `intel_pstate`, your system is compatible.
 
-# Installation
- It is very easy to install this script. The intel folder in opt should be placed under the /opt/ folder of your Linux distribution, while the intel-noturbo service file should be placed under the system subfolder of the systemd
- directory, located in /etc/systemd/system/. I've also put it inside its correct destination folder right in the repository so you can quickly identify where it should be dropped.
+---
 
- You may notice the script doesn't have execution privileges after extracting it. Make sure to set them:
-  ```shell
- chmod +x /opt/intel/intel_noturbo.sh
+## Installation
+
+### Systemd-Based Systems
+
+1. Copy the `intel` folder to `/opt/`:
+
+   ```bash
+   sudo cp -r intel /opt/
+   ```
+
+2. Copy the `intel-noturbo.service` file to the systemd directory:
+
+   ```bash
+   sudo cp systemd/intel-noturbo.service /etc/systemd/system/
+   ```
+
+3. Ensure the script has execution permissions:
+
+   ```bash
+   sudo chmod +x /opt/intel/intel_noturbo.sh
+   ```
+
+4. To automatically disable Turbo Boost at startup:
+
+   ```bash
+   sudo systemctl enable --now intel-noturbo.service
+   ```
+
+   Or, to disable Turbo Boost manually on demand:
+
+   ```bash
+   sudo systemctl start intel-noturbo.service
+   ```
+
+5. Check the service status:
+
+   ```bash
+   sudo systemctl status intel-noturbo.service
+   ```
+
+6. You can verify the Turbo Boost status at any time with:
+
+   ```bash
+   cat /sys/devices/system/cpu/intel_pstate/no_turbo
+   ```
+
+   * `0`: Turbo Boost is **enabled**
+   * `1`: Turbo Boost is **disabled**
+
+---
+
+### SysVinit-Based Systems
+
+1. Copy the `intel` folder to `/opt/`:
+
+   ```bash
+   sudo cp -r intel /opt/
+   ```
+
+2. Copy the init script to `/etc/init.d/`:
+
+   ```bash
+   sudo cp sysvinit/intel_noturbo /etc/init.d/
+   sudo chmod +x /etc/init.d/intel_noturbo
+   ```
+
+3. Enable the script to run at boot:
+
+   ```bash
+   sudo update-rc.d intel_noturbo defaults
+   ```
+
+4. To disable Turbo Boost immediately without rebooting:
+
+   ```bash
+   sudo /etc/init.d/intel_noturbo start
+   ```
+
+   Or:
+
+   ```bash
+   sudo service intel_noturbo start
+   ```
+
+---
+
+## Manual or Alternative Startup Methods
+
+If your system uses **OpenRC**, **runit**, **s6**, or other init systems, you can still use the script manually or set it to run at startup via alternative methods.
+
+### Manual Execution
+
+```bash
+sudo /opt/intel/intel_noturbo.sh
 ```
 
- If you want to automatically disable Turbo Boost at startup, you can do so with with:
+### Automatic Execution via Cron (Example)
 
- ```shell
- sudo systemctl enable --now intel-noturbo.service
-```
+1. Ensure `cronie` is installed:
 
- Or, you can just disable turbo manually at your will and not automatically with:
+   * **Debian/Ubuntu**:
 
- ```shell
- sudo systemctl start intel-noturbo.service
-```
+     ```bash
+     sudo apt install cronie
+     ```
 
- While you can check the service status with:
+   * **Fedora/RHEL**:
 
- ```shell
- sudo systemctl status intel-noturbo.service
-```
+     ```bash
+     sudo yum install cronie
+     ```
 
- You can also directly ask the system if Turbo Boost is enabled or disabled before and after applying the service with:
+   * **Arch Linux**:
 
- ```shell
- cat /sys/devices/system/cpu/intel_pstate/no_turbo
- ```
- This returns:
+     ```bash
+     sudo pacman -S cronie
+     ```
 
-   - ```0``` if turbo is enabled;
+2. Verify installation:
 
-   - ```1``` if turbo is disabled.
+   ```bash
+   crond -V
+   ```
 
-# Removal
- If you want to uninstall the service, first you need to disable it from running and activating on startup. You can disable it with:
+3. Edit the crontab:
 
- ```shell
- sudo systemctl disable --now intel-noturbo.service
-```
+   ```bash
+   crontab -e
+   ```
 
- Once the service is disabled, you can proceed to mask it so it cannot be started by any means. You can do so with:
+4. Add the following line to disable Turbo Boost at startup:
 
- ```shell
- sudo systemctl mask intel-noturbo.service
- ```
+   ```bash
+   @reboot sh /opt/intel/intel_noturbo.sh
+   ```
 
- You can now proceed to permanently remove the files from your system. You need to delete both the intel folder from /opt/ and the added systemd file.
+---
 
- ```shell
- sudo rm -r /opt/intel/
+## Removal
 
- sudo rm /etc/systemd/system/intel-noturbo.service
- ```
+### Systemd
 
- Reboot your system for the changes to take effect.
+1. Disable and stop the service:
 
-# Usage outside of systemd
- Not all Linux distributions come with the systemd daemon, but they may use other alternatives like OpenRC, runit or s6. In this case, you can still use the script but you can't enable it at startup with
- the method written above. What you can do instead is copy the intel folder in your system's /opt/ and follow one of the other methods listed [here](https://www.baeldung.com/linux/run-script-on-startup) to
- enable its autoexecution at startup.
- If you only want to execute it manually at your own pace, you can do so by opening the terminal and writing this command.
+   ```bash
+   sudo systemctl disable --now intel-noturbo.service
+   ```
 
-```shell
-sudo ./opt/intel/intel_noturbo.sh
-```
+2. Mask the service to prevent accidental activation:
 
- As an example, we can use the Cron Job method to automatically run the script at startup on non-systemd distributions. To do so, you have to first make sure that cronie is installed on your system.
- Open the terminal, and do the following:
+   ```bash
+   sudo systemctl mask intel-noturbo.service
+   ```
 
-- If you are on Debian or Ubuntu, type
+3. Remove installed files:
 
-  ```shell
-  sudo apt install cronie
-  ```
+   ```bash
+   sudo rm -r /opt/intel/
+   sudo rm /etc/systemd/system/intel-noturbo.service
+   ```
 
-- On Fedora or RHEL, type
+4. Reboot to apply changes.
 
-  ```shell
-  sudo yum install cronie
-  ```
+---
 
-- On Arch Linux and its derivatives, type
+### SysVinit
 
-  ```shell
-  sudo pacman -S cronie
-  ```
+1. Remove the service from startup:
 
- You can check if the installation was successful with:
+   ```bash
+   sudo update-rc.d -f intel_noturbo remove
+   ```
 
- ```shell
- crond -V
- ```
+2. Delete installed files:
 
- Now we need to edit the cron table to add our task which runs the custom script on startup. Type:
+   ```bash
+   sudo rm -r /opt/intel/
+   sudo rm /etc/init.d/intel_noturbo
+   ```
 
- ```shell
- crontab -e
- ```
+3. Reboot to apply changes.
 
- Then add said task using the @reboot expression, which executes the code once at startup:
+---
 
- ```shell
- @reboot sh /opt/intel/intel_noturbo.sh
- ```
+### Cron or Manual Installation
 
- If you want to remove the script in the future, first you need to delete its task from the cron table, typing again ```crontab -e``` and removing the line previously added.
- You can then proceed to delete all files from your system, following the same method as in [Removal](https://github.com/ShyVortex/intel-turbo/edit/main/README.md#removal):
+1. Remove the `@reboot` line from the crontab:
 
- ```shell
- sudo rm -r /opt/intel/
+   ```bash
+   crontab -e
+   ```
 
- sudo rm /etc/systemd/system/intel-noturbo.service
- ```
+2. Delete installed files:
 
-# License
- - This project is distributed under the [GNU General Public License v3.0](https://github.com/ShyVortex/intel-turbo/blob/main/LICENSE).
- - Copyright of [@ShyVortex](https://github.com/ShyVortex), 2023.
+   ```bash
+   sudo rm -r /opt/intel/
+   ```
+
+---
+
+## License
+
+* Licensed under the [GNU General Public License v3.0](https://github.com/ShyVortex/intel-turbo/blob/main/LICENSE).
+* Copyright © [@ShyVortex](https://github.com/ShyVortex), 2023.

@@ -1,0 +1,38 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          intel_noturbo
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: Disable Turbo Boost on Intel CPUs
+### END INIT INFO
+
+case "$1" in
+  start)
+    echo "Disabling Intel Turbo Boost..."
+    /opt/intel/intel_noturbo.sh
+    ;;
+  stop)
+    echo "Re-enabling Intel Turbo Boost..."
+    echo "0" > /sys/devices/system/cpu/intel_pstate/no_turbo
+    ;;
+  restart)
+    $0 start
+    ;;
+    status)
+      output=$(cat /sys/devices/system/cpu/intel_pstate/no_turbo)
+      if [ "$output" = "0" ]; then
+        echo "Intel Turbo Boost is ENABLED."
+      elif [ "$output" = "1" ]; then
+        echo "Intel Turbo Boost is DISABLED."
+      else
+        echo "Unable to determine Turbo Boost status."
+      fi
+      ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac
+
+exit 0
