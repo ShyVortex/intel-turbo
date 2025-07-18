@@ -31,7 +31,7 @@ If all outputs return `intel_pstate`, your system is compatible.
 2. Copy the `intel-noturbo.service` file to the systemd directory:
 
    ```bash
-   sudo cp systemd/intel-noturbo.service /etc/systemd/system/
+   sudo cp systemd/system/intel-noturbo.service /etc/systemd/system/
    ```
 
 3. Ensure the script has execution permissions:
